@@ -1,0 +1,11 @@
+kits:
+  kit_name:
+    diamond_sword:
+      meta:
+        display_name: '&csword of death'
+        lore:
+        - 'i eat pie'
+        - 'pokemon go'
+      enchantments:
+        unbreaking: 1
+        sharpness: 5
