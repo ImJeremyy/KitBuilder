@@ -1,6 +1,8 @@
 kits:
   kit_name:
+    permission: kitbuilder.kit.kit_name
     diamond_sword:
+      slot: 1
       meta:
         display_name: '&csword of death'
         lore:
