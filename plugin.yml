@@ -1,0 +1,15 @@
+name: KitBuilder
+version: 1.0
+main: me.markiscool.kitbuilder.KitBuilderPlugin
+author: MarkIsCool
+api-version: 1.13
+commands:
+  kit:
+    usage: /<command> <kit_name>
+    description: Base kit command
+  kits:
+    usage: /<command>
+    description: Gives you a list of kits
+  createkit:
+    usage: /<command> <kit_name>
+    description: Creates a new kit
