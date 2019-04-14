@@ -3,15 +3,23 @@ package me.markiscool.kitbuilder.kit;
 import me.markiscool.kitbuilder.KitBuilderPlugin;
 import me.markiscool.kitbuilder.utility.Chat;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * There should only be one instance of this class.
+ */
 public class KitManager {
 
     private KitBuilderPlugin plugin;
@@ -19,16 +27,26 @@ public class KitManager {
     private Set<Kit> kits;
 
     private File kitsFile;
-    private YamlConfiguration kitscfg;
+    private FileConfiguration kitscfg;
 
     /**
      * Main constructor
+     * 1. Transfers instance of main Plugin class
+     * 2. Attempts to create kits.yml
+     * > initializes FileConfiguration object as well
+     * 3. Initializes the main Set<Kit> object
+     * 4. Pulls from kits.yml
+     * > doesn't do anything if file is empty
+     * 5. Registers the push scheduler
+     * > Sets the periodic delay to 1 second if debug-mode is true, otherwise it is every 15 minutes.
      * @param plugin Instance of Plugin class
      */
     public KitManager(KitBuilderPlugin plugin) {
         this.plugin = plugin;
         createFile();
+        kits = new HashSet<>();
         pull();
+        registerPushScheduler();
     }
 
     /**
@@ -47,7 +65,7 @@ public class KitManager {
             plugin.getLogger().warning(Chat.colourize("&ckits.yml could not be created."));
         }
         kitscfg = YamlConfiguration.loadConfiguration(kitsFile);
-        if(kitscfg.contains("kits")) {
+        if(!kitscfg.contains("kits")) {
             kitscfg.createSection("kits");
             saveFile();
         }
@@ -75,18 +93,43 @@ public class KitManager {
             public void run() {
                 push();
             }
-        },1000, plugin.getDelay());
+        },100, plugin.getDelay());
     }
 
     /**
      * Push cache onto kits.yml
      */
     public void push() {
+        kitscfg.set("kits", null);
+        kitscfg.createSection("kits");
         for(Kit kit : kits) {
+            String kitName = kit.getName();
+            String permissionNode = kit.getPermission().getName();
+            kitscfg.set("kits." + kitName + ".permission", permissionNode);
             for(Map.Entry<Integer, ItemStack> entry : kit.getItems().entrySet()) {
-
+                ItemStack item = entry.getValue();
+                ItemMeta meta = item.getItemMeta();
+                int slot = entry.getKey();
+                String kitPath = "kits." + kitName + ".kit." + item.getType().name().toLowerCase() + "_0.";
+                int c = 0;
+                while(kitscfg.contains(kitPath)) {
+                    kitPath = "kits." + kitName + ".kit." + item.getType().name().toLowerCase() + "_" + c + ".";
+                    c++;
+                }
+                kitscfg.set(kitPath + "amount", item.getAmount());
+                kitscfg.set(kitPath + "slot", slot);
+                if(meta != null) {
+                    kitscfg.set(kitPath + "meta.display_name", meta.getDisplayName());
+                    if(meta.getLore() != null) kitscfg.set(kitPath + "lore", meta.getLore());
+                }
+                for(Map.Entry<Enchantment, Integer> ench : item.getEnchantments().entrySet()) {
+                    int level = ench.getValue();
+                    Enchantment enchantment = ench.getKey();
+                    kitscfg.set(kitPath + "enchantments." + enchantment.getName(), level);
+                }
             }
         }
+        saveFile();
     }
 
     /**
@@ -94,7 +137,12 @@ public class KitManager {
      * and adds them to KitManager
      */
     public void pull() {
-
+        kits.clear();
+        for(String k : kitscfg.getConfigurationSection("kits").getKeys(false)) {
+            ConfigurationSection cfgsec = kitscfg.getConfigurationSection("kits." + k + ".kit");
+            Kit kit = new Kit(k, cfgsec);
+            add(kit);
+        }
     }
 
     /**
@@ -102,7 +150,7 @@ public class KitManager {
      * @param kit kit to add
      */
     public void add(Kit kit) {
-        if(!kits.contains(kits)) {
+        if(!kits.contains(kit)) {
             kits.add(kit);
         }
     }
@@ -150,6 +198,13 @@ public class KitManager {
             }
         }
         return null;
+    }
+
+    /**
+     * @return Set<Kit>
+     */
+    public Set<Kit> getKits() {
+        return kits;
     }
 
 }
