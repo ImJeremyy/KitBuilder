@@ -5,7 +5,7 @@ package me.markiscool.kitbuilder.utility;
  * Use getMessage() to get the String
  */
 public enum Lang {
-    PREFIX("&b[&6Kit&aBuilder&b]&r "),
+    PREFIX("&b&l[&r&6Kit&6Builder&b&l]&r "),
     NOT_A_PLAYER("&cYou are not a player."),
     NO_PERMISSION("&cYou do not have permission to this command."),
     INVALID_ARGUMENTS("&cInvalid arguments.");
@@ -26,5 +26,13 @@ public enum Lang {
      */
     public String getMessage() {
         return Chat.colourize(message);
+    }
+
+    /**
+     * Override the default message using this method
+     * @param message change to message, use & for chat color
+     */
+    public void setMessage(String message) {
+        this.message = Chat.colourize(message);
     }
 }
