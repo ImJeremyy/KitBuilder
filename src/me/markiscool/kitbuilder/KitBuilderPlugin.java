@@ -1,9 +1,6 @@
 package me.markiscool.kitbuilder;
 
-import me.markiscool.kitbuilder.commands.CreateKitCommand;
-import me.markiscool.kitbuilder.commands.EditKitCommand;
-import me.markiscool.kitbuilder.commands.KitCommand;
-import me.markiscool.kitbuilder.commands.KitsCommand;
+import me.markiscool.kitbuilder.commands.*;
 import me.markiscool.kitbuilder.kit.KitManager;
 import me.markiscool.kitbuilder.listeners.GUIClickListener;
 import me.markiscool.kitbuilder.utility.Lang;
@@ -90,6 +87,7 @@ public class KitBuilderPlugin extends JavaPlugin {
         getCommand("kit").setExecutor(new KitCommand(this));
         getCommand("kits").setExecutor(new KitsCommand(this));
         getCommand("editkit").setExecutor(new EditKitCommand(this));
+        getCommand("kitbuilder").setExecutor(new KitBuilderCommand(this));
     }
 
     /**

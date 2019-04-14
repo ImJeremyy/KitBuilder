@@ -8,6 +8,7 @@ import org.bukkit.permissions.Permission;
  */
 public enum Perm {
 
+    KIT_BUILDER("kitbuilder.help"),
     CREATE_KIT("kitbuilder.create"),
     KIT("kitbuilder.kit"),
     KITS("kitbuilder.kits"),
