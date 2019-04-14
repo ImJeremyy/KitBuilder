@@ -1,13 +1,14 @@
 kits:
   kit_name:
     permission: kitbuilder.kit.kit_name
-    diamond_sword:
-      slot: 1
-      meta:
-        display_name: '&csword of death'
-        lore:
-        - 'i eat pie'
-        - 'pokemon go'
-      enchantments:
-        unbreaking: 1
-        sharpness: 5
+    kit:
+      diamond_sword:
+        slot: 1
+        meta:
+          display_name: '&csword of death'
+          lore:
+          - 'i eat pie'
+          - 'pokemon go'
+        enchantments:
+          unbreaking: 1
+          sharpness: 5
