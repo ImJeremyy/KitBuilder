@@ -7,6 +7,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Contains the common ItemStack objects - keeps it in cache so we don't have to keep making new objects
+ */
 public class Items {
 
     public static ItemStack blank;
