@@ -14,8 +14,14 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import static me.markiscool.kitbuilder.utility.InvUtil.getEmptySlots;
+
+/**
+ * onClick() is called when a player clicks in their inventory
+ */
 public class GUIClickListener implements Listener {
 
     private KitManager m_kit;
@@ -26,58 +32,90 @@ public class GUIClickListener implements Listener {
         prefix = Lang.PREFIX.getMessage();
     }
 
+    /**
+     * Checks for the inventory name.. If the inventory name belongs to a kit name, then it will evaluate
+     * what to do based on what they clicked.
+     * Clicking on air will not do anything.
+     * @param event - InventoryClickEvent object passed by the server
+     */
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         if(event.getWhoClicked() instanceof Player) {
             Player player = (Player) event.getWhoClicked();
             String inventoryName = player.getOpenInventory().getTitle();
             if(m_kit.containsKitName(inventoryName)) {
-                event.setCancelled(true);
-                ItemStack item = event.getCurrentItem();
                 Kit kit = m_kit.getKit(inventoryName);
-                if(item.equals(Items.kit)) {
-                    player.closeInventory();
-                    player.openInventory(kit.getKitGUI());
-                } else if(item.equals(Items.delete)) {
-                    m_kit.remove(kit);
-                    player.sendMessage(prefix + Chat.colourize("&aSuccessfully removed kit &c" + Chat.strip(kit.getName())));
-                } else if(item.equals(Items.receive)) {
-                    Inventory inventory = player.getInventory();
-                    int emptySlots = getEmptySlots(inventory);
-                    if(emptySlots >= kit.getItems().size()) {
-                        for(Map.Entry<Integer, ItemStack> entry : kit.getItems().entrySet()) {
-                            int slot = entry.getKey();
-                            ItemStack i = entry.getValue();
-                            ItemStack check = inventory.getItem(slot);
-                            if(check != null) {
-                                if(check.getType().equals(Material.AIR)) {
-                                    inventory.setItem(slot, i);
-                                } else {
-                                    inventory.addItem(i);
+                ItemStack item = event.getCurrentItem();
+                if(item != null) {
+                    if (item.equals(Items.kit)) { //open kit gui editor
+                        //don't let them take it
+                        event.setCancelled(true);
+                        //close the original menu
+                        player.closeInventory();
+                        //update the gui
+                        kit.generateKitGUI();
+                        //open the kit editor gui
+                        player.openInventory(kit.getKitGUI());
+                    } else if (item.equals(Items.delete)) { //delete the kit from KitManager set
+                        //don't let them take it
+                        event.setCancelled(true);
+                        //remove it from the Set<Kit>
+                        m_kit.remove(kit);
+                        //send them a success message
+                        player.sendMessage(prefix + Chat.colourize("&aSuccessfully removed kit &c" + Chat.strip(kit.getName())));
+                        //close the inventory
+                        player.closeInventory();
+                    } else if (item.equals(Items.receive)) { //receive the kit
+                        //don't let them take the item
+                        event.setCancelled(true);
+                        if(!kit.getItems().isEmpty()) {
+                            Inventory inventory = player.getInventory();
+                            int emptySlots = getEmptySlots(inventory); //get the empty slots
+                            //if their is room for them to receive the kit...
+                            if (emptySlots >= kit.getItems().size()) {
+                                //give them the kit
+                                for (Map.Entry<Integer, ItemStack> entry : kit.getItems().entrySet()) {
+                                    int slot = entry.getKey();
+                                    ItemStack i = entry.getValue();
+                                    ItemStack check = inventory.getItem(slot); //checks if the desired place is air/null
+                                    if (check != null) {
+                                        if (check.getType().equals(Material.AIR)) {
+                                            inventory.setItem(slot, i);
+                                        } else {
+                                            //that slot is taken..
+                                            inventory.addItem(i);
+                                        }
+                                    } else {
+                                        inventory.setItem(slot, i);
+                                    }
                                 }
+                                player.closeInventory();
+                                player.sendMessage(prefix + Chat.colourize("&aSuccessfully received kit &6" + kit.getName()));
                             } else {
-                                inventory.setItem(slot, i);
+                                player.sendMessage(prefix + Chat.colourize("&cYour inventory is full!"));
+                                player.closeInventory();
                             }
+                        } else {
+                            player.sendMessage(prefix + Chat.colourize("&cThis kit is empty."));
                         }
-                        player.sendMessage(prefix + Chat.colourize("&aSuccessfully received kit &6" + kit.getName()));
-                    } else {
-                        player.sendMessage(prefix + Chat.colourize("&CYour inventory is fulL!"));
+                    } else if (item.equals(Items.save)) { //save the item layout onto kit object
+                        event.setCancelled(true);
+                        Inventory inventory = event.getClickedInventory();
+                        Map<Integer, ItemStack> items = new HashMap<>();
+                        for (int i = 0; i < 36; i++) {
+                            ItemStack is = inventory.getItem(i);
+                            if (is != null) items.put(i, is);
+                        }
+                        kit.setItems(items);
+                        player.closeInventory();
+                        player.sendMessage(prefix + Chat.colourize("&aSuccessfully saved kit &6" + kit.getName()));
+                    } else if (item.equals(Items.black) || item.equals(Items.blank)) { //separator ItemStack objects
+                        //don't let them take it
+                        event.setCancelled(true);
                     }
                 }
             }
         }
-    }
-
-    private int getEmptySlots(Inventory inventory) {
-        int count = 0;
-        for(ItemStack is : inventory.getContents()) {
-            if(is == null) {
-                count++;
-            } else if(is.getType().equals(Material.AIR)) {
-                count++;
-            }
-        }
-        return count;
     }
 
 }
