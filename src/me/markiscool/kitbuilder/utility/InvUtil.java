@@ -22,6 +22,6 @@ public class InvUtil {
                 count++;
             }
         }
-        return count;
+        return count - 5 /* subtract 5 because armor and off hand count as 1 empty slot*/;
     }
 }
