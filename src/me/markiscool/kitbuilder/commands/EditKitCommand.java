@@ -3,6 +3,7 @@ package me.markiscool.kitbuilder.commands;
 import me.markiscool.kitbuilder.KitBuilderPlugin;
 import me.markiscool.kitbuilder.kit.Kit;
 import me.markiscool.kitbuilder.kit.KitManager;
+import me.markiscool.kitbuilder.utility.Chat;
 import me.markiscool.kitbuilder.utility.Lang;
 import me.markiscool.kitbuilder.utility.Perm;
 import org.bukkit.command.Command;
@@ -26,8 +27,12 @@ public class EditKitCommand implements CommandExecutor {
             Player player = (Player) sender;
             if(player.hasPermission(Perm.EDIT_KIT.getPermission())) {
                 if(args.length == 1) {
-                    Kit kit = m_kit.getKit(args[0]);
-                    player.openInventory(kit.getGUI());
+                    if(m_kit.containsKitName(args[0])) {
+                        Kit kit = m_kit.getKit(args[0]);
+                        player.openInventory(kit.getGUI());
+                    } else {
+                        player.sendMessage(prefix + Chat.colourize("&cKit not found. &7Try /kits"));
+                    }
                 } else {
                     player.sendMessage(prefix + Lang.INVALID_ARGUMENTS.getMessage());
                 }
