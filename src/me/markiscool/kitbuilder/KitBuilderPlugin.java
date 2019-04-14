@@ -4,6 +4,7 @@ import me.markiscool.kitbuilder.commands.*;
 import me.markiscool.kitbuilder.kit.KitManager;
 import me.markiscool.kitbuilder.listeners.GUIClickListener;
 import me.markiscool.kitbuilder.utility.Lang;
+import me.markiscool.kitbuilder.utility.Metrics;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,6 +32,7 @@ public class KitBuilderPlugin extends JavaPlugin {
         registerManagers();
         registerListeners();
         registerCommands();
+        new Metrics(this);
     }
 
     /**
