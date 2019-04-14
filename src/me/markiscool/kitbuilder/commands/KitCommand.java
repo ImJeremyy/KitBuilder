@@ -37,30 +37,34 @@ public class KitCommand implements CommandExecutor {
                     String kitName = args[0];
                     if(m_kit.containsKitName(kitName)) {
                         Kit kit = m_kit.getKit(kitName);
-                        if(!kit.getItems().isEmpty()) {
-                            Inventory inventory = player.getInventory();
-                            int emptySlots = getEmptySlots(inventory);
-                            if (emptySlots >= kit.getItems().size()) {
-                                for (Map.Entry<Integer, ItemStack> entry : kit.getItems().entrySet()) {
-                                    int slot = entry.getKey();
-                                    ItemStack i = entry.getValue();
-                                    ItemStack check = inventory.getItem(slot);
-                                    if (check != null) {
-                                        if (check.getType().equals(Material.AIR)) {
-                                            inventory.setItem(slot, i);
+                        if(player.hasPermission(kit.getPermission())) {
+                            if (! kit.getItems().isEmpty()) {
+                                Inventory inventory = player.getInventory();
+                                int emptySlots = getEmptySlots(inventory);
+                                if (emptySlots >= kit.getItems().size()) {
+                                    for (Map.Entry<Integer, ItemStack> entry : kit.getItems().entrySet()) {
+                                        int slot = entry.getKey();
+                                        ItemStack i = entry.getValue();
+                                        ItemStack check = inventory.getItem(slot);
+                                        if (check != null) {
+                                            if (check.getType().equals(Material.AIR)) {
+                                                inventory.setItem(slot, i);
+                                            } else {
+                                                inventory.addItem(i);
+                                            }
                                         } else {
-                                            inventory.addItem(i);
+                                            inventory.setItem(slot, i);
                                         }
-                                    } else {
-                                        inventory.setItem(slot, i);
                                     }
+                                    player.sendMessage(prefix + Chat.colourize("&aSuccessfully received kit &6" + kit.getName()));
+                                } else {
+                                    player.sendMessage(prefix + Chat.colourize("&cYour inventory is full!"));
                                 }
-                                player.sendMessage(prefix + Chat.colourize("&aSuccessfully received kit &6" + kit.getName()));
                             } else {
-                                player.sendMessage(prefix + Chat.colourize("&cYour inventory is full!"));
+                                player.sendMessage(prefix + Chat.colourize("&cThis kit is empty!"));
                             }
                         } else {
-                            player.sendMessage(prefix + Chat.colourize("&cThis kit is empty!"));
+                            player.sendMessage(prefix + Lang.NO_PERMISSION.getMessage());
                         }
                     } else {
                         player.sendMessage(prefix + Chat.colourize("&cKit not found."));
