@@ -27,11 +27,13 @@ public class CreateKitCommand implements CommandExecutor {
             Player player = (Player) sender;
             if(player.hasPermission(Perm.CREATE_KIT.getPermission())) {
                 if(args.length == 1) {
-                    //TODO
-                    Kit kit = new Kit(args[0]);
-                    m_kit.add(kit);
-                    player.openInventory(kit.getGUI());
-                    //2. Open kit gui
+                    if(!m_kit.containsKitName(args[0])) {
+                        Kit kit = new Kit(args[0]);
+                        m_kit.add(kit);
+                        player.openInventory(kit.getGUI());
+                    } else {
+                        player.sendMessage(prefix + Chat.colourize("&cKit with this name already exists. Choose a different name!"));
+                    }
                 } else {
                     player.sendMessage(prefix + Lang.INVALID_ARGUMENTS.getMessage() + Chat.colourize(" &7/createkit <kit_name>"));
                 }
