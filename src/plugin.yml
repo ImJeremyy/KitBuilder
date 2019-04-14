@@ -16,3 +16,6 @@ commands:
   editkit:
     usage: /<command> <kit_name>
     description: Opens the edit kit GUI
+  kitbuilder:
+    usage: /<command> [help]
+    description: List of commands
