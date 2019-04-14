@@ -13,3 +13,6 @@ commands:
   createkit:
     usage: /<command> <kit_name>
     description: Creates a new kit
+  editkit:
+    usage: /<command> <kit_name>
+    description: Opens the edit kit GUI
