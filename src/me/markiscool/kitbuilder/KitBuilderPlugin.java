@@ -1,11 +1,27 @@
 package me.markiscool.kitbuilder;
 
+import me.markiscool.kitbuilder.commands.CreateKitCommand;
+import me.markiscool.kitbuilder.commands.EditKitCommand;
+import me.markiscool.kitbuilder.commands.KitCommand;
+import me.markiscool.kitbuilder.commands.KitsCommand;
 import me.markiscool.kitbuilder.kit.KitManager;
 import me.markiscool.kitbuilder.listeners.GUIClickListener;
+import me.markiscool.kitbuilder.utility.Lang;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * Main plugin class
+ * onEnable() is called when the server starts
+ *
+ * To do list (if I have free time):
+ * - Add more Lang enums (there are a lot of commonly used phrases that are not currently Lang enums)
+ * - Make the GUIClickListener more readable
+ * - Add an armor & off hand slot
+ * - In /kits, only make the kits they have permission to visible.
+ * - Add a nether star in each Kit GUI that shows the permissiono for the kit
+ */
 public class KitBuilderPlugin extends JavaPlugin {
 
     private KitManager kitManager;
@@ -16,6 +32,8 @@ public class KitBuilderPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         registerManagers();
+        registerListeners();
+        registerCommands();
     }
 
     /**
@@ -23,18 +41,30 @@ public class KitBuilderPlugin extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-
+        kitManager.push();
     }
 
     /**
      * Registeres manager classes as well as the main config (config.yml).
      */
     private void registerManagers() {
-        kitManager = new KitManager(this);
-        if(!getConfig().contains("debug-mode")) {
-            getConfig().set("debug-mode", false);
-            saveConfig();
+        //create data folder, in case it doesn't exist.
+        if(!getDataFolder().exists()) {
+            getDataFolder().mkdir();
         }
+        //checking for config default values
+        if(!getConfig().contains("debug-mode")) {
+            getConfig().set("debug-mode", false); //note - set debug mode to false if you want your server to be less laggy.
+        }
+        if(!getConfig().contains("prefix")) {
+            getConfig().set("prefix", Lang.PREFIX.getMessage());
+        } else {
+            Lang.PREFIX.setMessage(getConfig().getString("prefix"));
+        }
+        saveConfig();
+
+        //creating kit manager object
+        kitManager = new KitManager(this);
     }
 
     /**
@@ -52,6 +82,17 @@ public class KitBuilderPlugin extends JavaPlugin {
     }
 
     /**
+     * Registers commands
+     * Commands must also correspond with plugin.yml "commands" section
+     */
+    private void registerCommands() {
+        getCommand("createkit").setExecutor(new CreateKitCommand(this));
+        getCommand("kit").setExecutor(new KitCommand(this));
+        getCommand("kits").setExecutor(new KitsCommand(this));
+        getCommand("editkit").setExecutor(new EditKitCommand(this));
+    }
+
+    /**
      * Get the instance of KitManager
      * @return KitManager instance
      */
@@ -65,7 +106,7 @@ public class KitBuilderPlugin extends JavaPlugin {
      * @return Push scheduler delay in ticks
      */
     public int getDelay() {
-        return getConfig().getBoolean("debug-mode") ? 20 : 18000;
+        return getConfig().getBoolean("debug-mode") ? 10 : 18000;
     }
 
 }
