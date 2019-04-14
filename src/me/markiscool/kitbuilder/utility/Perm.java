@@ -10,7 +10,8 @@ public enum Perm {
 
     CREATE_KIT("kitbuilder.create"),
     KIT("kitbuilder.kit"),
-    KITS("kitbuilder.kits");
+    KITS("kitbuilder.kits"),
+    EDIT_KIT("kitbuilder.edit");
 
     private Permission permission;
 
