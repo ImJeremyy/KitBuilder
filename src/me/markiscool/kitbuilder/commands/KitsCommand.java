@@ -11,6 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class KitsCommand implements CommandExecutor {
@@ -30,7 +31,9 @@ public class KitsCommand implements CommandExecutor {
             if(!kits.isEmpty()) {
                 String msg = ChatColor.GOLD + "Kits: "+ ChatColor.WHITE;
                 for(Kit kit : kits) {
-                    msg += kit.getName()  + ", ";
+                    if(sender.hasPermission(kit.getPermission())) {
+                        msg += kit.getName()  + ", ";
+                    }
                 }
                 sender.sendMessage(msg);
             } else {
