@@ -1,6 +1,7 @@
 package me.markiscool.kitbuilder.kit;
 
 import me.markiscool.kitbuilder.utility.Items;
+import me.markiscool.kitbuilder.utility.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -94,7 +95,7 @@ public class Kit {
         for (int i = 0; i < gui.getSize(); i ++) {
             gui.setItem(i, Items.blank);
         }
-        gui.setItem(4, Items.generateItemStack(Material.NETHER_STAR, 1, "&b" + getName(), Arrays.asList("&aPermission node: &7" + getPermission().getName())));
+        gui.setItem(4, Items.generateItemStack(XMaterial.NETHER_STAR, 1, "&b" + getName(), Arrays.asList("&aPermission node: &7" + getPermission().getName())));
         gui.setItem(10, Items.kit);
         gui.setItem(13, Items.receive);
         gui.setItem(16, Items.delete);
