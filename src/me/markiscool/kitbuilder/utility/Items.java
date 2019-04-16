@@ -19,19 +19,21 @@ public class Items {
     public static ItemStack receive;
     public static ItemStack black;
     public static ItemStack save;
+    public static ItemStack quit;
 
     static {
         if(KitBuilderPlugin.getVersion() == Version.v1_12_R1) {
-            blank = generateItemStack(Material.WHITE_STAINED_GLASS_PANE, 1, (byte) 0, "", Arrays.asList("&f-"));
-            black = generateItemStack(Material.WHITE_STAINED_GLASS_PANE, 1, (byte) 15,  "", Arrays.asList("&l-x-"));
+            blank = generateItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 0, "", Arrays.asList("&f-"));
+            black = generateItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 15,  "", Arrays.asList("&l-x-"));
         } else if(KitBuilderPlugin.getVersion() == Version.v1_13_R1 || KitBuilderPlugin.getVersion() == Version.v1_13_R2) {
-            blank = generateItemStack(Material.WHITE_STAINED_GLASS_PANE, 1, "", Arrays.asList("&f-"));
-            black = generateItemStack(Material.BLACK_STAINED_GLASS_PANE, 1, "", Arrays.asList("&l-x-"));
+            blank = generateItemStack(Material.STAINED_GLASS_PANE, 1, "", Arrays.asList("&f-"));
+            black = generateItemStack(Material.STAINED_GLASS_PANE, 1, "", Arrays.asList("&l-x-"));
         }
         kit = generateItemStack(Material.DIAMOND_SWORD, 1, "&bEdit this kit", Arrays.asList("&aAdd and remove items in the kit"));
         delete = generateItemStack(Material.BARRIER, 1, "&cDelete this kit", Arrays.asList("&cYOU CANNOT UNDO THIS!"));
         receive = generateItemStack(Material.EMERALD, 1, "&aReceive this kit", Arrays.asList("&bMake sure you have room in your inventory!"));
         save = generateItemStack(Material.EMERALD_BLOCK,1, "&aSave Changes", Arrays.asList("&aClick this will save the kit changes above."));
+        quit = generateItemStack(Material.BARRIER, 1, "&cClose", Arrays.asList("&fClick me to close"));
     }
 
     /**

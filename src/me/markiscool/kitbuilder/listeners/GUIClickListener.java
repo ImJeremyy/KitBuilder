@@ -112,6 +112,9 @@ public class GUIClickListener implements Listener {
                     } else if (item.equals(Items.black) || item.equals(Items.blank)) { //separator ItemStack objects
                         //don't let them take it
                         event.setCancelled(true);
+                    } else if(item.equals(Items.quit)) {
+                        event.setCancelled(true);
+                        player.closeInventory();
                     }
                 }
             }

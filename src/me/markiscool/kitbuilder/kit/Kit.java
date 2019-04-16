@@ -98,6 +98,7 @@ public class Kit {
         gui.setItem(10, Items.kit);
         gui.setItem(13, Items.receive);
         gui.setItem(16, Items.delete);
+        gui.setItem(18, Items.quit);
     }
 
     /**
