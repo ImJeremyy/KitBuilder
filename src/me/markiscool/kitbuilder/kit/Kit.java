@@ -94,7 +94,7 @@ public class Kit {
         for (int i = 0; i < gui.getSize(); i ++) {
             gui.setItem(i, Items.blank);
         }
-        gui.setItem(4, Items.generateItemStack(Material.NETHER_STAR, "&b" + getName(), Arrays.asList("&aPermission node: &7" + getPermission().getName())));
+        gui.setItem(4, Items.generateItemStack(Material.NETHER_STAR, 1, "&b" + getName(), Arrays.asList("&aPermission node: &7" + getPermission().getName())));
         gui.setItem(10, Items.kit);
         gui.setItem(13, Items.receive);
         gui.setItem(16, Items.delete);

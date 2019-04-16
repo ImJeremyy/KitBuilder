@@ -3,8 +3,11 @@ package me.markiscool.kitbuilder;
 import me.markiscool.kitbuilder.commands.*;
 import me.markiscool.kitbuilder.kit.KitManager;
 import me.markiscool.kitbuilder.listeners.GUIClickListener;
+import me.markiscool.kitbuilder.utility.Chat;
 import me.markiscool.kitbuilder.utility.Lang;
 import me.markiscool.kitbuilder.utility.Metrics;
+import me.markiscool.kitbuilder.utility.Version;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -16,9 +19,9 @@ import org.bukkit.plugin.java.JavaPlugin;
  * To do list (if I have free time):
  * - Add more Lang enums (there are a lot of commonly used phrases that are not currently Lang enums)
  * - Make the GUIClickListener more readable
- * - Add an armor & off hand slot
- * - In /kits, only make the kits they have permission to visible.
- * - Add a nether star in each Kit GUI that shows the permissiono for the kit
+ * - Add an armor & off hand slot in the kit editor
+ * - In /kits, only make the kits they have permission to visible. > DONE
+ * - Add a nether star in each Kit GUI that shows the permissiono for the kit > DONE
  */
 public class KitBuilderPlugin extends JavaPlugin {
 
@@ -32,7 +35,10 @@ public class KitBuilderPlugin extends JavaPlugin {
         registerManagers();
         registerListeners();
         registerCommands();
-        new Metrics(this);
+        new Metrics(this); //bStats
+        if(getVersion() == null) {
+            getLogger().warning(Chat.colourize("&cVersion not found.. this plugin may not work."));
+        }
     }
 
     /**
@@ -108,5 +114,47 @@ public class KitBuilderPlugin extends JavaPlugin {
     public int getDelay() {
         return getConfig().getBoolean("debug-mode") ? 10 : 18000;
     }
+
+    /*
+     * @return Version enum
+     */
+    public static Version getVersion() {
+        String stringVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+        Version version;
+        switch (stringVersion) {
+            case "v1_8_R1":
+                version = Version.v1_8_R1;
+                break;
+            case "v1_8_R2":
+                version = Version.v1_8_R2;
+                break;
+            case "v1_8_R3":
+                version = Version.v1_8_R3;
+                break;
+            case "v1_9_R1":
+                version = Version.v1_9_R1;
+                break;
+            case "v1_9_R2":
+                version = Version.v1_9_R2;
+                break;
+            case "v1_10_R1":
+                version = Version.v1_11_R1;
+                break;
+            case "v1_12_R1":
+                version = Version.v1_12_R1;
+                break;
+            case "v1_13_R1":
+                version = Version.v1_13_R1;
+                break;
+            case "v1_13_R2":
+                version = Version.v1_13_R2;
+                break;
+            default:
+                version = null;
+                break;
+        }
+        return version;
+    }
+
 
 }
