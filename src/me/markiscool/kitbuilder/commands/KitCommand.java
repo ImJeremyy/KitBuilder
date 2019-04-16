@@ -69,6 +69,8 @@ public class KitCommand implements CommandExecutor {
                     } else {
                         player.sendMessage(prefix + Chat.colourize("&cKit not found."));
                     }
+                } else {
+                    player.sendMessage(prefix + Lang.INVALID_ARGUMENTS.getMessage());
                 }
             } else {
                 sender.sendMessage(prefix + Lang.NO_PERMISSION.getMessage());
