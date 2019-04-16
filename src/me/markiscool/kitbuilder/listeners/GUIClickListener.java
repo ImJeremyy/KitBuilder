@@ -6,6 +6,7 @@ import me.markiscool.kitbuilder.kit.KitManager;
 import me.markiscool.kitbuilder.utility.Chat;
 import me.markiscool.kitbuilder.utility.Items;
 import me.markiscool.kitbuilder.utility.Lang;
+import me.markiscool.kitbuilder.utility.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -97,6 +98,7 @@ public class GUIClickListener implements Listener {
                             }
                         } else {
                             player.sendMessage(prefix + Chat.colourize("&cThis kit is empty."));
+                            player.closeInventory();
                         }
                     } else if (item.equals(Items.save)) { //save the item layout onto kit object
                         event.setCancelled(true);
@@ -109,7 +111,7 @@ public class GUIClickListener implements Listener {
                         kit.setItems(items);
                         player.closeInventory();
                         player.sendMessage(prefix + Chat.colourize("&aSuccessfully saved kit &6" + kit.getName()));
-                    } else if (item.equals(Items.black) || item.equals(Items.blank)) { //separator ItemStack objects
+                    } else if (item.equals(Items.black) || item.equals(Items.blank) || item.getType().equals(XMaterial.NETHER_STAR.parseMaterial())) { //separator ItemStack objects
                         //don't let them take it
                         event.setCancelled(true);
                     } else if(item.equals(Items.quit)) {
