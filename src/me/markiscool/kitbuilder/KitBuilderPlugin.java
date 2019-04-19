@@ -2,12 +2,10 @@ package me.markiscool.kitbuilder;
 
 import me.markiscool.kitbuilder.commands.*;
 import me.markiscool.kitbuilder.kit.KitManager;
+import me.markiscool.kitbuilder.listeners.ChatListener;
 import me.markiscool.kitbuilder.listeners.GUIClickListener;
-import me.markiscool.kitbuilder.utility.Chat;
 import me.markiscool.kitbuilder.utility.Lang;
 import me.markiscool.kitbuilder.utility.Metrics;
-import me.markiscool.kitbuilder.utility.Version;
-import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class KitBuilderPlugin extends JavaPlugin {
 
+    private ChatListener chatListener;
     private KitManager kitManager;
 
     /**
@@ -36,9 +35,6 @@ public class KitBuilderPlugin extends JavaPlugin {
         registerListeners();
         registerCommands();
         new Metrics(this); //bStats
-        if(getVersion() == null) {
-            getLogger().warning(Chat.colourize("&cVersion not found.. this plugin may not work."));
-        }
     }
 
     /**
@@ -78,6 +74,7 @@ public class KitBuilderPlugin extends JavaPlugin {
      */
     private void registerListeners() {
         Object[] listeners = {
+                chatListener = new ChatListener(),
                 new GUIClickListener(this)
         };
         PluginManager pm = getServer().getPluginManager();
@@ -107,53 +104,20 @@ public class KitBuilderPlugin extends JavaPlugin {
     }
 
     /**
+     * Get the instance of ChatListener.java
+     * @return ChatListener instance
+     */
+    public ChatListener getChatListener() {
+        return chatListener;
+    }
+
+    /**
      * Returns 20 (1 minute). if debug mode is true. Otherwise, returns 180000 (15 minutes)
      * 20 ticks = 1 second.
      * @return Push scheduler delay in ticks
      */
     public int getDelay() {
         return getConfig().getBoolean("debug-mode") ? 10 : 18000;
-    }
-
-    /*
-     * @return Version enum
-     */
-    public static Version getVersion() {
-        String stringVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        Version version;
-        switch (stringVersion) {
-            case "v1_8_R1":
-                version = Version.v1_8_R1;
-                break;
-            case "v1_8_R2":
-                version = Version.v1_8_R2;
-                break;
-            case "v1_8_R3":
-                version = Version.v1_8_R3;
-                break;
-            case "v1_9_R1":
-                version = Version.v1_9_R1;
-                break;
-            case "v1_9_R2":
-                version = Version.v1_9_R2;
-                break;
-            case "v1_10_R1":
-                version = Version.v1_11_R1;
-                break;
-            case "v1_12_R1":
-                version = Version.v1_12_R1;
-                break;
-            case "v1_13_R1":
-                version = Version.v1_13_R1;
-                break;
-            case "v1_13_R2":
-                version = Version.v1_13_R2;
-                break;
-            default:
-                version = null;
-                break;
-        }
-        return version;
     }
 
 
