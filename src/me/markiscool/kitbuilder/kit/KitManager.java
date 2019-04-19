@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * There should only be one instance of this class.
@@ -105,7 +106,9 @@ public class KitManager {
         for(Kit kit : kits) {
             String kitName = kit.getName();
             String permissionNode = kit.getPermission().getName();
+            long cooldown = kit.getCooldown();
             kitscfg.set("kits." + kitName + ".permission", permissionNode);
+            kitscfg.set("kits." + kitName + ".cooldown", cooldown);
             for(Map.Entry<Integer, ItemStack> entry : kit.getItems().entrySet()) {
                 ItemStack item = entry.getValue();
                 ItemMeta meta = item.getItemMeta();
@@ -128,6 +131,11 @@ public class KitManager {
                     kitscfg.set(kitPath + "enchantments." + enchantment.getName(), level);
                 }
             }
+            String playersPath = "kits." + kitName + ".players";
+            kitscfg.createSection(playersPath);
+            for(Map.Entry<UUID, Long> entry : kit.getCooldownPlayers().entrySet()) {
+                kitscfg.set(playersPath + "." + entry.getKey(), entry.getValue());
+            }
         }
         saveFile();
     }
@@ -139,8 +147,8 @@ public class KitManager {
     public void pull() {
         kits.clear();
         for(String k : kitscfg.getConfigurationSection("kits").getKeys(false)) {
-            ConfigurationSection cfgsec = kitscfg.getConfigurationSection("kits." + k + ".kit");
-            Kit kit = new Kit(k, cfgsec);
+            ConfigurationSection cfgsec = kitscfg.getConfigurationSection("kits." + k);
+            Kit kit = new Kit(k, cfgsec); //this constructor contains pull code
             add(kit);
         }
     }

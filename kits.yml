@@ -1,5 +1,6 @@
 kits:
   kit_name:
+    cooldown: 0 # in seconds
     permission: kitbuilder.kit.kit_name
     kit:
       diamond_sword:
@@ -12,3 +13,5 @@ kits:
         enchantments:
           unbreaking: 1
           sharpness: 5
+      players:
+        123456-uuidhere-123456: 1900000000 # System#currentTimeMilliseconds() when they received the kit

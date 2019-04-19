@@ -1,10 +1,10 @@
 package me.markiscool.kitbuilder.kit;
 
 import me.markiscool.kitbuilder.utility.Items;
+import me.markiscool.kitbuilder.utility.Perm;
 import me.markiscool.kitbuilder.utility.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -13,23 +13,23 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Kit {
 
+    private final String permissionBeginning = "kitbuilder.kit.";
     private String name;
     private Permission permission;
     private Map<Integer, ItemStack> items;
     private Inventory gui;
     private Inventory kitgui;
-
-    private final String permissionBeginning = "kitbuilder.kit.";
+    private long cooldown; //in seconds
+    private Map<UUID, Long> cooldownPlayers;
 
     /**
      * This constructor is for creating entirely new kits.
+     *
      * @param name Name of the kit
      */
     public Kit(final String name) {
@@ -37,28 +37,34 @@ public class Kit {
         this.permission = new Permission(permissionBeginning + name.toLowerCase());
         this.permission.setDefault(PermissionDefault.OP);
         this.items = new HashMap<>();
+        this.cooldown = 0;
+        this.cooldownPlayers = new HashMap<>();
         this.generateGUI();
         this.generateKitGUI();
     }
 
     /**
      * This constructor if for pulling from .yml files.
-     * @param name Name of the kit
-     * @param kitItems .yml section where items are held
+     *
+     * @param name       Name of the kit
+     * @param kitSection is the .yml section where items are held
      */
-    public Kit(final String name, final ConfigurationSection kitItems) {
+    public Kit(final String name, final ConfigurationSection kitSection) {
         this.name = name;
         this.permission = new Permission(permissionBeginning + name.toLowerCase());
         this.permission.setDefault(PermissionDefault.OP);
         this.items = new HashMap<>();
+        this.cooldownPlayers = new HashMap<>();
+        this.cooldown = kitSection.getLong("cooldown");
         this.generateGUI();
 
-        if(kitItems != null) {
-            for(String i : kitItems.getKeys(false)) {
+        ConfigurationSection kitItems = kitSection.getConfigurationSection("kit");
+        if (kitItems != null) {
+            for (String i : kitItems.getKeys(false)) {
                 //eliminates the _# at the end of each material name and gets the material name in the end
                 char[] m = i.toCharArray();
                 char[] f = new char[m.length - 2];
-                for(int l = 0; l < f.length; l++) {
+                for (int l = 0; l < f.length; l++) {
                     f[l] = m[l];
                 }
                 String matName = new String(f).toLowerCase();
@@ -66,14 +72,14 @@ public class Kit {
                 int amount = kitItems.getInt(i + ".amount");
                 ItemStack item = new ItemStack(material, amount);
                 ItemMeta meta = item.getItemMeta();
-                if(kitItems.contains(i + ".meta")) {
+                if (kitItems.contains(i + ".meta")) {
                     meta.setDisplayName(kitItems.getString(i + ".meta.display_name"));
-                    if(kitItems.contains(i + ".meta.lore")) {
+                    if (kitItems.contains(i + ".meta.lore")) {
                         meta.setLore(new ArrayList<>(kitItems.getStringList(i + ".meta.lore")));
                     }
                 }
-                if(kitItems.contains(i + ".enchantments")) {
-                    for(String ench : kitItems.getConfigurationSection(i + ".enchantments").getKeys(false)) {
+                if (kitItems.contains(i + ".enchantments")) {
+                    for (String ench : kitItems.getConfigurationSection(i + ".enchantments").getKeys(false)) {
                         Enchantment enchantment = Enchantment.getByName(ench);
                         int level = kitItems.getInt(i + ".enchantments." + ench);
                         meta.addEnchant(enchantment, level, true);
@@ -92,7 +98,7 @@ public class Kit {
      */
     private void generateGUI() {
         gui = Bukkit.createInventory(null, 27, name);
-        for (int i = 0; i < gui.getSize(); i ++) {
+        for (int i = 0; i < gui.getSize(); i++) {
             gui.setItem(i, Items.blank);
         }
         gui.setItem(4, Items.generateItemStack(XMaterial.NETHER_STAR, 1, "&b" + getName(), Arrays.asList("&aPermission node: &7" + getPermission().getName())));
@@ -107,12 +113,12 @@ public class Kit {
      */
     public void generateKitGUI() {
         kitgui = Bukkit.createInventory(null, 54, name);
-        for(Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
+        for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
             ItemStack item = entry.getValue();
             int slot = entry.getKey();
             kitgui.setItem(slot, item);
         }
-        for(int i = 36; i < 45; i++) {
+        for (int i = 36; i < 45; i++) {
             kitgui.setItem(i, Items.black);
         }
         kitgui.setItem(53, Items.save);
@@ -128,6 +134,7 @@ public class Kit {
     /**
      * Will look something like "kitbuilder.kit.NAME"
      * See #getName()
+     *
      * @return Permission object
      */
     public Permission getPermission() {
@@ -137,6 +144,7 @@ public class Kit {
     /**
      * Integer is the inventory slot number
      * ItemStack is the ItemStack/
+     *
      * @return Map of Integer-ItemStack
      */
     public Map<Integer, ItemStack> getItems() {
@@ -144,7 +152,6 @@ public class Kit {
     }
 
     /**
-     *
      * @param items
      */
     public void setItems(Map<Integer, ItemStack> items) {
@@ -155,6 +162,7 @@ public class Kit {
      * @return GUI meant to be opened see GUIClickListener.java
      */
     public Inventory getGUI() {
+        gui.setItem(11, Items.generateItemStack(XMaterial.DIAMOND, 1, "&bChange the cooldown", Arrays.asList("&aClicking this will prompt you to", "&aenter the cooldown &6(in seconds)", "&6Current cooldown: &f" + getCooldown())));
         return gui;
     }
 
@@ -165,4 +173,80 @@ public class Kit {
         return kitgui;
     }
 
+    /**
+     * @return the cool down (in seconds)
+     */
+    public long getCooldown() {
+        return cooldown;
+    }
+
+    /**
+     * @param cooldownSeconds cool down in seconds
+     */
+    public void setCooldown(long cooldownSeconds) {
+        this.cooldown = cooldownSeconds;
+    }
+
+    /**
+     *
+     */
+    public Map<UUID, Long> getCooldownPlayers() {
+        return this.cooldownPlayers;
+    }
+
+    /**
+     * @param uuid      UUID of the player player#getUniqueId()
+     * @param timeStamp Should be the current time in milliseconds when they took the kit. Use System#currentTimeMilliseconds()
+     */
+    public void addCooldownPlayer(UUID uuid, long timeStamp) {
+        this.cooldownPlayers.put(uuid, timeStamp);
+    }
+
+    /**
+     * @param uuid UUID of the player player#getUniqueId()
+     */
+    public void removeCooldownPlayer(UUID uuid) {
+        this.cooldownPlayers.remove(uuid);
+    }
+
+    /**
+     * @param uuid UUID of the player player#getUniqueId()
+     * @return time stamp of when they were added
+     */
+    public long getTimeStamp(UUID uuid) {
+        if (containsCooldownPlayer(uuid)) {
+            return this.cooldownPlayers.get(uuid);
+        }
+        return System.currentTimeMillis();
+    }
+
+    /**
+     * @param uuid UUID of the player player#getUniqueId()
+     * @return true if their found in the map
+     */
+    public boolean containsCooldownPlayer(UUID uuid) {
+        return cooldownPlayers.containsKey(uuid);
+    }
+
+    /**
+     * @param uuid UUID of the player player#getUniqueId()
+     * @return true if they can receive the kit
+     */
+    public boolean canReceiveKit(UUID uuid) {
+        if (Bukkit.getPlayer(uuid).hasPermission(Perm.NO_COOLDOWNS.getPermission())) {
+            return true;
+        }
+        if (containsCooldownPlayer(uuid)) {
+            long current = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
+            long timeStamp = TimeUnit.MILLISECONDS.toSeconds(getTimeStamp(uuid));
+            if ((current - timeStamp) >= cooldown) { //if the time passed is greater or equal to the cool down
+                removeCooldownPlayer(uuid);
+                return true;
+            } else { // they are within cool down
+                return false;
+            }
+        }
+        //they are not even in the cool down thingy
+        return true;
+    }
 }
