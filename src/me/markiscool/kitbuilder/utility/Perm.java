@@ -11,6 +11,7 @@ public enum Perm {
     KIT_BUILDER("kitbuilder.help"),
     CREATE_KIT("kitbuilder.create"),
     KIT("kitbuilder.kit"),
+    KIT_OTHERS("kitbuilder.kit.others"),
     KITS("kitbuilder.kits"),
     EDIT_KIT("kitbuilder.edit"),
     NO_COOLDOWNS("kitbuilder.nocooldowns"),
