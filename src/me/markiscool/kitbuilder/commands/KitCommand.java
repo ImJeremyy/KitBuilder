@@ -112,21 +112,25 @@ public class KitCommand implements CommandExecutor {
                 sender.sendMessage(prefix + Chat.colourize("&cYou must be a player to run this command."));
             }
         } else if (args.length == 2) {
-            String kitName = args[0];
-            Player targetPlayer;
-            try {
-                targetPlayer = Bukkit.getPlayer(args[1]);
-            } catch (Exception ex) {
-                sender.sendMessage(prefix + Lang.PLAYER_NOT_FOUND.getMessage());
-                return true;
-            }
-            if(m_kit.containsKitName(kitName)) {
-                Kit kit = m_kit.getKit(kitName);
-                giveKit(targetPlayer.getInventory(), kit.getItems());
-                sender.sendMessage(prefix + "&aKit &6" + kit.getName() + " &awas sent to &6" +targetPlayer.getName());
-                targetPlayer.sendMessage(prefix + "&aKit received from &6" + sender.getName());
+            if(sender.hasPermission(Perm.KIT_OTHERS.getPermission())) {
+                String kitName = args[0];
+                Player targetPlayer;
+                try {
+                    targetPlayer = Bukkit.getPlayer(args[1]);
+                } catch (Exception ex) {
+                    sender.sendMessage(prefix + Lang.PLAYER_NOT_FOUND.getMessage());
+                    return true;
+                }
+                if (m_kit.containsKitName(kitName)) {
+                    Kit kit = m_kit.getKit(kitName);
+                    giveKit(targetPlayer.getInventory(), kit.getItems());
+                    sender.sendMessage(prefix + Chat.colourize("&aKit &6" + kit.getName() + " &awas sent to &6" + targetPlayer.getName()));
+                    targetPlayer.sendMessage(prefix + Chat.colourize("&aKit received from &6" + sender.getName()));
+                } else {
+                    sender.sendMessage(prefix + Lang.KIT_NOT_FOUND.getMessage());
+                }
             } else {
-                sender.sendMessage(prefix + Lang.KIT_NOT_FOUND.getMessage());
+                sender.sendMessage(prefix + Lang.NO_PERMISSION.getMessage());
             }
         } else {
             sender.sendMessage(prefix + Lang.INVALID_ARGUMENTS.getMessage());
@@ -134,6 +138,11 @@ public class KitCommand implements CommandExecutor {
         return true;
     }
 
+    /**
+     * Displays cool down left for the player and their kit
+     * @param kit kit with cooldown
+     * @param player player with kit cooldown
+     */
     private void timeStuff(Kit kit, Player player) {
         long secondsLeft = kit.getCooldown() - TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - kit.getTimeStamp(player.getUniqueId()));
         long minutesLeft = TimeUnit.SECONDS.toMinutes(secondsLeft);
@@ -185,6 +194,11 @@ public class KitCommand implements CommandExecutor {
         }
     }
 
+    /**
+     * Gives the kit to the player's inventory
+     * @param inventory Inventory of player
+     * @param items Map<Integer, ItemStack> of the items, Integer - slot and ItemStack - the item
+     */
     private void giveKit(Inventory inventory, Map<Integer, ItemStack> items) {
         for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
             int slot = entry.getKey();
