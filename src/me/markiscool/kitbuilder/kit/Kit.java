@@ -1,5 +1,6 @@
 package me.markiscool.kitbuilder.kit;
 
+import me.markiscool.kitbuilder.utility.Chat;
 import me.markiscool.kitbuilder.utility.Items;
 import me.markiscool.kitbuilder.utility.Perm;
 import me.markiscool.kitbuilder.utility.XMaterial;
@@ -16,6 +17,10 @@ import org.bukkit.permissions.PermissionDefault;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Kit class
+ * Holds inventory gui, cooldown, items and more.
+ */
 public class Kit {
 
     private final String permissionBeginning = "kitbuilder.kit.";
@@ -30,7 +35,6 @@ public class Kit {
 
     /**
      * This constructor is for creating entirely new kits.
-     *
      * @param name Name of the kit
      */
     public Kit(final String name) {
@@ -47,7 +51,6 @@ public class Kit {
 
     /**
      * This constructor if for pulling from .yml files.
-     *
      * @param name       Name of the kit
      * @param kitSection is the .yml section where items are held
      */
@@ -135,6 +138,14 @@ public class Kit {
     }
 
     /**
+     * Set the name of the kit, automatically colourizes it already
+     * @param name String name of the kit
+     */
+    public void setName(String name) {
+        this.name = Chat.colourize(name);
+    }
+
+    /**
      * Will look something like "kitbuilder.kit.NAME"
      * See #getName()
      *
@@ -155,7 +166,7 @@ public class Kit {
     }
 
     /**
-     * @param items
+     * @param items Set the items of the kit
      */
     public void setItems(Map<Integer, ItemStack> items) {
         this.items = items;
@@ -166,6 +177,7 @@ public class Kit {
      */
     public Inventory getGUI() {
         gui.setItem(11, Items.generateItemStack(XMaterial.DIAMOND, 1, "&bChange the cooldown", Arrays.asList("&aClicking this will prompt you to", "&aenter the cooldown &6(in seconds)", "&6Current cooldown: &f" + getCooldown())));
+        gui.setItem(12, Items.generateItemStack(XMaterial.GOLD_INGOT, 1 , "&eCost upon receiving the kit", Arrays.asList("&eSet the cost of the kit.", "&eDefault: 0", "&6Current price: &b" + getCost())));
         return gui;
     }
 
@@ -191,7 +203,7 @@ public class Kit {
     }
 
     /**
-     *
+     * @return Map<UUID, Long> of all the players and their stamps of when they obtained the kit
      */
     public Map<UUID, Long> getCooldownPlayers() {
         return this.cooldownPlayers;

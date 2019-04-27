@@ -9,7 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Contains the common ItemStack objects - keeps it in cache so we don't have to keep making new objects
+ * Contains the common ItemStack objects - keeps it in cache so we don't have to keep making new objects.
+ * Class uses XMaterial.java for parsing Material objects across nms versions.
  */
 public class Items {
 

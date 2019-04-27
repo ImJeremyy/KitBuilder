@@ -20,6 +20,7 @@ import java.util.UUID;
 
 /**
  * There should only be one instance of this class.
+ * This class manages all Kit objects as well as file pushing/pulling
  */
 public class KitManager {
 

@@ -19,18 +19,32 @@ public class KitBuilderCommand implements CommandExecutor {
 
     private String prefix;
 
+    /**
+     * Initializes String prefix
+     * @param plugin Main instance of plugin
+     */
     public KitBuilderCommand(KitBuilderPlugin plugin) {
         prefix = Lang.PREFIX.getMessage();
     }
 
+    /**
+     * /kitbuilder [help]
+     * @return always true
+     */
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if(sender.hasPermission(Perm.KIT_BUILDER.getPermission())) {
             sendHelpMessage(sender);
+        } else {
+            sender.sendMessage(prefix + Lang.NO_PERMISSION.getMessage());
         }
         return true;
     }
 
+    /**
+     * Sends them the help message
+     * @param sender CommandSender to send message to
+     */
     private void sendHelpMessage(CommandSender sender) {
         sender.sendMessage(prefix + Chat.colourize("&6Made by: MarkIsCool"));
         sender.sendMessage(Chat.colourize("&b&lKitBuilder Commands:"));

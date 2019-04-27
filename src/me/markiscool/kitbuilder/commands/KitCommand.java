@@ -27,6 +27,10 @@ public class KitCommand implements CommandExecutor {
     private KitManager m_kit;
     private Economy economy;
 
+    /**
+     * Initializes economy instance, KitManager and String prefix
+     * @param plugin Main instance of plugin
+     */
     public KitCommand(KitBuilderPlugin plugin) {
         prefix = Lang.PREFIX.getMessage();
         m_kit = plugin.getKitManager();
@@ -34,6 +38,10 @@ public class KitCommand implements CommandExecutor {
 
     }
 
+    /**
+     * /kit command
+     * @return always true
+     */
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if(sender instanceof Player) {

@@ -6,7 +6,6 @@ import me.markiscool.kitbuilder.listeners.ChatListener;
 import me.markiscool.kitbuilder.listeners.GUIClickListener;
 import me.markiscool.kitbuilder.utility.Lang;
 import me.markiscool.kitbuilder.utility.Metrics;
-import net.milkbowl.vault.Vault;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;

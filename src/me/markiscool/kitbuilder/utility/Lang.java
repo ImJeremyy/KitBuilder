@@ -5,6 +5,7 @@ package me.markiscool.kitbuilder.utility;
  * Use getMessage() to get the String
  */
 public enum Lang {
+
     PREFIX("&b&l[&r&6Kit&6Builder&b&l]&r "),
     NOT_A_PLAYER("&cYou are not a player."),
     NO_PERMISSION("&cYou do not have permission to this command."),

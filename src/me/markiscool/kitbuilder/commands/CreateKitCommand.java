@@ -16,11 +16,19 @@ public class CreateKitCommand implements CommandExecutor {
     private String prefix;
     private KitManager m_kit;
 
+    /**
+     * Initializes KitManager instance as well as String prefix
+     * @param plugin Main instance of plugin
+     */
     public CreateKitCommand(KitBuilderPlugin plugin) {
         prefix = Lang.PREFIX.getMessage();
         m_kit = plugin.getKitManager();
     }
 
+    /**
+     * /createkit <kit_name>
+     * @return always true
+     */
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if(sender instanceof Player) {
