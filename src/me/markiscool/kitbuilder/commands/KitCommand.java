@@ -128,6 +128,8 @@ public class KitCommand implements CommandExecutor {
             } else {
                 sender.sendMessage(prefix + Lang.KIT_NOT_FOUND.getMessage());
             }
+        } else {
+            sender.sendMessage(prefix + Lang.INVALID_ARGUMENTS.getMessage());
         }
         return true;
     }
