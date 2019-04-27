@@ -1,8 +1,10 @@
 name: KitBuilder
 version: 1.0
 main: me.markiscool.kitbuilder.KitBuilderPlugin
-author: MarkIsCool
 api-version: 1.13
+author: MarkIsCool
+description: Build kits within game, fully customizable
+softdepend: [Vault]
 commands:
   kit:
     usage: /<command> <kit_name>
