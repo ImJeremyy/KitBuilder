@@ -107,8 +107,10 @@ public class KitManager {
             String kitName = kit.getName();
             String permissionNode = kit.getPermission().getName();
             long cooldown = kit.getCooldown();
+            double cost = kit.getCost();
             kitscfg.set("kits." + kitName + ".permission", permissionNode);
             kitscfg.set("kits." + kitName + ".cooldown", cooldown);
+            kitscfg.set("kits." + kitName + ".cost", cost);
             for(Map.Entry<Integer, ItemStack> entry : kit.getItems().entrySet()) {
                 ItemStack item = entry.getValue();
                 ItemMeta meta = item.getItemMeta();

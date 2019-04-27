@@ -6,8 +6,10 @@ import me.markiscool.kitbuilder.listeners.ChatListener;
 import me.markiscool.kitbuilder.listeners.GUIClickListener;
 import me.markiscool.kitbuilder.utility.Lang;
 import me.markiscool.kitbuilder.utility.Metrics;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -15,16 +17,22 @@ import org.bukkit.plugin.java.JavaPlugin;
  * onEnable() is called when the server starts
  *
  * To do list (if I have free time):
- * - Add more Lang enums (there are a lot of commonly used phrases that are not currently Lang enums)
- * - Make the GUIClickListener more readable
  * - Add an armor & off hand slot in the kit editor
- * - In /kits, only make the kits they have permission to visible. > DONE
- * - Add a nether star in each Kit GUI that shows the permissiono for the kit > DONE
+ * - Make KitCommand more readable (with the time stamps and stuff)
+ *
+ * TODO right away:
+ * - Allow owners to give kits to others /kit <name> [player]
+ * - Add cost editor to kit gui edit thingy
+ * - Check for 1.14. compatability
+ *
+ * New Permission:
+ * - kitbuilder.nocharge
  */
 public class KitBuilderPlugin extends JavaPlugin {
 
     private ChatListener chatListener;
     private KitManager kitManager;
+    private Economy economy;
 
     /**
      * Run when the server turns on
@@ -66,6 +74,7 @@ public class KitBuilderPlugin extends JavaPlugin {
 
         //creating kit manager object
         kitManager = new KitManager(this);
+        registerEconomy();
     }
 
     /**
@@ -95,6 +104,18 @@ public class KitBuilderPlugin extends JavaPlugin {
         getCommand("kitbuilder").setExecutor(new KitBuilderCommand(this));
     }
 
+    private boolean registerEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        economy = rsp.getProvider();
+        return economy != null;
+    }
+
     /**
      * Get the instance of KitManager
      * @return KitManager instance
@@ -104,7 +125,7 @@ public class KitBuilderPlugin extends JavaPlugin {
     }
 
     /**
-     * Get the instance of ChatListener.java
+     * Get the instance of ChatListener
      * @return ChatListener instance
      */
     public ChatListener getChatListener() {
@@ -112,12 +133,21 @@ public class KitBuilderPlugin extends JavaPlugin {
     }
 
     /**
-     * Returns 20 (1 minute). if debug mode is true. Otherwise, returns 180000 (15 minutes)
+     * Get the instance of Economy
+     * @return Economy instance
+     */
+    public Economy getEconomy() {
+        return economy;
+    }
+
+    /**
+     * Returns 20 (1 second). if debug mode is true. Otherwise, returns 180000 (15 minutes)
      * 20 ticks = 1 second.
+     * Note: Set debug-mode to false if you want your server to be less laggy
      * @return Push scheduler delay in ticks
      */
     public int getDelay() {
-        return getConfig().getBoolean("debug-mode") ? 10 : 18000;
+        return getConfig().getBoolean("debug-mode") ? 20 : 18000;
     }
 
 

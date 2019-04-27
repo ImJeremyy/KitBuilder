@@ -31,7 +31,7 @@ public class EditKitCommand implements CommandExecutor {
                         Kit kit = m_kit.getKit(args[0]);
                         player.openInventory(kit.getGUI());
                     } else {
-                        player.sendMessage(prefix + Chat.colourize("&cKit not found. &7Try /kits"));
+                        player.sendMessage(prefix + Lang.KIT_NOT_FOUND.getMessage());
                     }
                 } else {
                     player.sendMessage(prefix + Lang.INVALID_ARGUMENTS.getMessage());

@@ -8,7 +8,11 @@ public enum Lang {
     PREFIX("&b&l[&r&6Kit&6Builder&b&l]&r "),
     NOT_A_PLAYER("&cYou are not a player."),
     NO_PERMISSION("&cYou do not have permission to this command."),
-    INVALID_ARGUMENTS("&cInvalid arguments.");
+    INVALID_ARGUMENTS("&cInvalid arguments."),
+    NOT_ENOUGH_MONEY("&cYou cannot afford that."),
+    INVENTORY_FULL("&cInventory full."),
+    KIT_EMPTY("&cThis kit is empty."),
+    KIT_NOT_FOUND("&cKit not found.");
 
     private String message;
 
@@ -17,7 +21,7 @@ public enum Lang {
      * @param message Insert message here, use & for chat color
      */
     Lang(String message) {
-        this.message = message;
+        this.message = Chat.colourize(message);
     }
 
     /**
@@ -25,7 +29,7 @@ public enum Lang {
      * @return colourized String
      */
     public String getMessage() {
-        return Chat.colourize(message);
+        return message;
     }
 
     /**

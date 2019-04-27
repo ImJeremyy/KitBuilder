@@ -6,6 +6,7 @@ import me.markiscool.kitbuilder.kit.KitManager;
 import me.markiscool.kitbuilder.utility.Chat;
 import me.markiscool.kitbuilder.utility.Lang;
 import me.markiscool.kitbuilder.utility.Perm;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -24,10 +25,13 @@ public class KitCommand implements CommandExecutor {
 
     private String prefix;
     private KitManager m_kit;
+    private Economy economy;
 
     public KitCommand(KitBuilderPlugin plugin) {
         prefix = Lang.PREFIX.getMessage();
         m_kit = plugin.getKitManager();
+        economy = plugin.getEconomy();
+
     }
 
     @Override
@@ -40,37 +44,44 @@ public class KitCommand implements CommandExecutor {
                     if(m_kit.containsKitName(kitName)) {
                         Kit kit = m_kit.getKit(kitName);
                         if(kit.canReceiveKit(player.getUniqueId())) {
-                            if (player.hasPermission(kit.getPermission())) {
-                                if (!kit.getItems().isEmpty()) {
-                                    Inventory inventory = player.getInventory();
-                                    int emptySlots = getEmptySlots(inventory);
-                                    if (emptySlots >= kit.getItems().size()) {
-                                        for (Map.Entry<Integer, ItemStack> entry : kit.getItems().entrySet()) {
-                                            int slot = entry.getKey();
-                                            ItemStack i = entry.getValue();
-                                            ItemStack check = inventory.getItem(slot);
-                                            if (check != null) {
-                                                if (check.getType().equals(Material.AIR)) {
-                                                    inventory.setItem(slot, i);
+                            if(economy.getBalance(player) >= kit.getCost()) {
+                                if (player.hasPermission(kit.getPermission())) {
+                                    if (!kit.getItems().isEmpty()) {
+                                        Inventory inventory = player.getInventory();
+                                        int emptySlots = getEmptySlots(inventory);
+                                        if (emptySlots >= kit.getItems().size()) {
+                                            for (Map.Entry<Integer, ItemStack> entry : kit.getItems().entrySet()) {
+                                                int slot = entry.getKey();
+                                                ItemStack i = entry.getValue();
+                                                ItemStack check = inventory.getItem(slot);
+                                                if (check != null) {
+                                                    if (check.getType().equals(Material.AIR)) {
+                                                        inventory.setItem(slot, i);
+                                                    } else {
+                                                        inventory.addItem(i);
+                                                    }
                                                 } else {
-                                                    inventory.addItem(i);
+                                                    inventory.setItem(slot, i);
                                                 }
-                                            } else {
-                                                inventory.setItem(slot, i);
                                             }
+                                            if(!player.hasPermission(Perm.NO_CHARGE.getPermission())) {
+                                                economy.withdrawPlayer(player, kit.getCost());
+                                            }
+                                            if (!player.hasPermission(Perm.NO_COOLDOWNS.getPermission())) {
+                                                kit.addCooldownPlayer(player.getUniqueId(), System.currentTimeMillis());
+                                            }
+                                            player.sendMessage(prefix + Chat.colourize("&aSuccessfully received kit &6" + kit.getName()));
+                                        } else {
+                                            player.sendMessage(prefix + Lang.INVENTORY_FULL.getMessage());
                                         }
-                                        if(!player.hasPermission(Perm.NO_COOLDOWNS.getPermission())) {
-                                            kit.addCooldownPlayer(player.getUniqueId(), System.currentTimeMillis());
-                                        }
-                                        player.sendMessage(prefix + Chat.colourize("&aSuccessfully received kit &6" + kit.getName()));
                                     } else {
-                                        player.sendMessage(prefix + Chat.colourize("&cYour inventory is full!"));
+                                        player.sendMessage(prefix + Lang.KIT_EMPTY.getMessage());
                                     }
                                 } else {
-                                    player.sendMessage(prefix + Chat.colourize("&cThis kit is empty!"));
+                                    player.sendMessage(prefix + Lang.NO_PERMISSION.getMessage());
                                 }
                             } else {
-                                player.sendMessage(prefix + Lang.NO_PERMISSION.getMessage());
+                                player.sendMessage(prefix + Lang.NOT_ENOUGH_MONEY.getMessage());
                             }
                         } else {
                             long secondsLeft = kit.getCooldown() - TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - kit.getTimeStamp(player.getUniqueId()));
@@ -123,7 +134,7 @@ public class KitCommand implements CommandExecutor {
                             }
                         }
                     } else {
-                        player.sendMessage(prefix + Chat.colourize("&cKit not found."));
+                        player.sendMessage(prefix + Lang.KIT_NOT_FOUND.getMessage());
                     }
                 } else {
                     player.sendMessage(prefix + Lang.INVALID_ARGUMENTS.getMessage());

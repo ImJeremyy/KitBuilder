@@ -26,6 +26,7 @@ public class Kit {
     private Inventory kitgui;
     private long cooldown; //in seconds
     private Map<UUID, Long> cooldownPlayers;
+    private double cost;
 
     /**
      * This constructor is for creating entirely new kits.
@@ -39,6 +40,7 @@ public class Kit {
         this.items = new HashMap<>();
         this.cooldown = 0;
         this.cooldownPlayers = new HashMap<>();
+        this.cost = 0;
         this.generateGUI();
         this.generateKitGUI();
     }
@@ -56,6 +58,7 @@ public class Kit {
         this.items = new HashMap<>();
         this.cooldownPlayers = new HashMap<>();
         this.cooldown = kitSection.getLong("cooldown");
+        this.cost = kitSection.getInt("cost");
         this.generateGUI();
 
         ConfigurationSection kitItems = kitSection.getConfigurationSection("kit");
@@ -248,5 +251,20 @@ public class Kit {
         }
         //they are not even in the cool down thingy
         return true;
+    }
+
+    /**
+     * @return cost (double) of the kit
+     */
+    public double getCost() {
+        return cost;
+    }
+
+    /**
+     * Sets the cost of the plugin
+     * @param cost to obtain the kit
+     */
+    public void setCost(double cost) {
+        this.cost = cost;
     }
 }
