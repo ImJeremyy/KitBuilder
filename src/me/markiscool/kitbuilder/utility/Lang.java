@@ -13,7 +13,9 @@ public enum Lang {
     NOT_ENOUGH_MONEY("&cYou cannot afford that."),
     INVENTORY_FULL("&cInventory full."),
     KIT_EMPTY("&cThis kit is empty."),
-    KIT_NOT_FOUND("&cKit not found.");
+    KIT_NOT_FOUND("&cKit not found."),
+    PLAYER_NOT_FOUND("&cPlayer not found"),
+    ;
 
     private String message;
 
