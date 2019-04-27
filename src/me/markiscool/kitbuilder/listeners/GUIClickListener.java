@@ -153,9 +153,6 @@ public class GUIClickListener implements Listener {
                                                 }
                                             }
                                             player.closeInventory();
-                                            if (!player.hasPermission(Perm.NO_CHARGE.getPermission())) {
-                                                economy.withdrawPlayer(player, kit.getCost());
-                                            }
                                             if (!player.hasPermission(Perm.NO_COOLDOWNS.getPermission())) {
                                                 kit.addCooldownPlayer(player.getUniqueId(), System.currentTimeMillis());
                                             }
@@ -241,16 +238,25 @@ public class GUIClickListener implements Listener {
                     } else if(item.equals(Items.quit)) {
                         event.setCancelled(true);
                         player.closeInventory();
-                    } else if(item.getType().equals(XMaterial.DIAMOND.parseMaterial()) && item.hasItemMeta() && item.getItemMeta().hasLore() && Chat.strip(item.getItemMeta().getDisplayName()).equalsIgnoreCase("Cooldown")) {
+                    } else if(item.getType().equals(XMaterial.DIAMOND.parseMaterial()) && item.hasItemMeta() && item.getItemMeta().hasLore() && Chat.strip(item.getItemMeta().getDisplayName()).equalsIgnoreCase("change the cooldown")) {
                         event.setCancelled(true);
                         player.closeInventory();
-                        player.sendMessage(prefix + Chat.colourize("&aHow long should the cool down be (in seconds)."));
+                        player.sendMessage(prefix + Chat.colourize("&aHow long should the cool down be (in seconds)? (Type in chat)"));
                         chatListener.add(player.getUniqueId(), kit, 0);
-                    } else if(item.getType().equals(XMaterial.IRON_INGOT) && item.hasItemMeta() && item.getItemMeta().hasLore() && Chat.strip(item.getItemMeta().getDisplayName()).equalsIgnoreCase("Cost")) {
+                    } else if(item.getType().equals(XMaterial.GOLD_INGOT.parseMaterial()) && item.hasItemMeta() && item.getItemMeta().hasLore() && Chat.strip(item.getItemMeta().getDisplayName()).equalsIgnoreCase("change the cost")) {
                         event.setCancelled(true);
                         player.closeInventory();
-                        player.sendMessage("&aWhat would you like the cost of this kit to be? &e" + kit.getName());
-                        chatListener.add(player.getUniqueId(), kit, 1);
+                        if(economy != null) {
+                            player.sendMessage(prefix + Chat.colourize("&aWhat would you like the cost of this kit to be? (Type in chat)"));
+                            chatListener.add(player.getUniqueId(), kit, 1);
+                        } else {
+                            player.sendMessage(prefix + Chat.colourize("&cVault not found, no economy :("));
+                        }
+                    } else if(item.getType().equals(XMaterial.SIGN.parseMaterial()) && item.hasItemMeta() && item.getItemMeta().hasLore() && Chat.strip(item.getItemMeta().getDisplayName()).equalsIgnoreCase("change the name")) {
+                        event.setCancelled(true);
+                        player.closeInventory();
+                        player.sendMessage(prefix + Chat.colourize("&aWhat would you like for the name to be? (Type in chat)"));
+                        chatListener.add(player.getUniqueId(), kit, 2);
                     }
                 }
             }

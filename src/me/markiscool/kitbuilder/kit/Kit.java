@@ -131,6 +131,23 @@ public class Kit {
     }
 
     /**
+     * @return GUI meant to be opened see GUIClickListener.java
+     */
+    public Inventory getGUI() {
+        gui.setItem(11, Items.generateItemStack(XMaterial.DIAMOND, 1, "&bChange the Cooldown", Arrays.asList("&eChange the cooldown &6(in seconds)", "&6Current cooldown: &f" + getCooldown())));
+        gui.setItem(12, Items.generateItemStack(XMaterial.GOLD_INGOT, 1 , "&bChange the Cost", Arrays.asList("&eSet the cost of the kit.", "&6Current price: &b" + getCost())));
+        gui.setItem(15, Items.generateItemStack(XMaterial.SIGN, 1, "&bChange the Name", Arrays.asList("&eSet the name of the kit.", "&6Current name: &b" + getName())));
+        return gui;
+    }
+
+    /**
+     * @return GUI where user edits the kit
+     */
+    public Inventory getKitGUI() {
+        return kitgui;
+    }
+
+    /**
      * @return Name of the kit
      */
     public String getName() {
@@ -173,22 +190,6 @@ public class Kit {
     }
 
     /**
-     * @return GUI meant to be opened see GUIClickListener.java
-     */
-    public Inventory getGUI() {
-        gui.setItem(11, Items.generateItemStack(XMaterial.DIAMOND, 1, "&bChange the cooldown", Arrays.asList("&aClicking this will prompt you to", "&aenter the cooldown &6(in seconds)", "&6Current cooldown: &f" + getCooldown())));
-        gui.setItem(12, Items.generateItemStack(XMaterial.GOLD_INGOT, 1 , "&eCost upon receiving the kit", Arrays.asList("&eSet the cost of the kit.", "&eDefault: 0", "&6Current price: &b" + getCost())));
-        return gui;
-    }
-
-    /**
-     * @return GUI where user edits the kit
-     */
-    public Inventory getKitGUI() {
-        return kitgui;
-    }
-
-    /**
      * @return the cool down (in seconds)
      */
     public long getCooldown() {
@@ -226,6 +227,14 @@ public class Kit {
 
     /**
      * @param uuid UUID of the player player#getUniqueId()
+     * @return true if their found in the map
+     */
+    public boolean containsCooldownPlayer(UUID uuid) {
+        return cooldownPlayers.containsKey(uuid);
+    }
+
+    /**
+     * @param uuid UUID of the player player#getUniqueId()
      * @return time stamp of when they were added
      */
     public long getTimeStamp(UUID uuid) {
@@ -233,14 +242,6 @@ public class Kit {
             return this.cooldownPlayers.get(uuid);
         }
         return System.currentTimeMillis();
-    }
-
-    /**
-     * @param uuid UUID of the player player#getUniqueId()
-     * @return true if their found in the map
-     */
-    public boolean containsCooldownPlayer(UUID uuid) {
-        return cooldownPlayers.containsKey(uuid);
     }
 
     /**
