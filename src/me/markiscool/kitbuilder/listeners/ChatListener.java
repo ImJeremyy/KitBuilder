@@ -35,7 +35,7 @@ public class ChatListener implements Listener {
      * Adds to both maps
      * @param uuid uuid of the player
      * @param kit kit to edit
-     * @param task task = 0, then changing cooldown, if the task = 1, then we're changing the cost
+     * @param task task = 0, then changing cooldown, if the task = 1, then we're changing the cost, if the task = 2, then we're changing the name
      */
     public void add(UUID uuid, Kit kit, int task) {
         uuids.put(uuid, kit);
@@ -63,9 +63,9 @@ public class ChatListener implements Listener {
             Kit kit = uuids.get(player.getUniqueId());
             event.setCancelled(true);
             int task = tasks.get(uuid);
+            String message = event.getMessage();
             if (task == 0) {
                 double seconds = 0;
-                String message = event.getMessage();
                 try {
                     seconds = Double.parseDouble(message);
                 } catch (Exception ex) {
@@ -74,9 +74,17 @@ public class ChatListener implements Listener {
                 kit.setCooldown((int) seconds);
                 player.sendMessage(prefix + Chat.colourize("&aKit &6" + kit.getName() + " &anow has a cooldown of &6" + kit.getCooldown()));
             } else if(task == 1) {
-                String name = event.getMessage();
-                kit.setName(name);
-                player.sendMessage(prefix + Chat.colourize("&aKit &6" + kit.getName() + " &anow has a name of " + kit.getName()));
+                double cost = 0;
+                try {
+                    cost = Double.parseDouble(message);
+                    kit.setCost(cost);
+                    player.sendMessage(prefix + Chat.colourize("&aKit &6" + kit.getName() + " &anow has a cost of &6" + kit.getCost()));
+                } catch (Exception ex) {
+                    player.sendMessage(prefix + Chat.colourize("&cInvalid input. Make sure it's a number"));
+                }
+            } else if(task == 2) {
+                kit.setName(message);
+                player.sendMessage(prefix + Chat.colourize("&aKit &6" +kit.getName() + " &anow has a name of " + kit.getName()));
             }
             remove(player.getUniqueId());
         }
