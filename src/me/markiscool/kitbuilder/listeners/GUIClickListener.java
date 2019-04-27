@@ -21,6 +21,7 @@ import static me.markiscool.kitbuilder.utility.InvUtil.getEmptySlots;
 
 /**
  * onClick() is called when a player clicks in their inventory
+ * This class handles all of the inventory click listening for guis.
  */
 public class GUIClickListener implements Listener {
 
@@ -29,6 +30,9 @@ public class GUIClickListener implements Listener {
     private Economy economy;
     private String prefix;
 
+    /**
+     * @param plugin Main plugin instance
+     */
     public GUIClickListener(KitBuilderPlugin plugin) {
         chatListener = plugin.getChatListener();
         m_kit = plugin.getKitManager();
@@ -237,11 +241,16 @@ public class GUIClickListener implements Listener {
                     } else if(item.equals(Items.quit)) {
                         event.setCancelled(true);
                         player.closeInventory();
-                    } else if(item.getType().equals(XMaterial.DIAMOND.parseMaterial()) && item.getItemMeta().hasLore()) {
+                    } else if(item.getType().equals(XMaterial.DIAMOND.parseMaterial()) && item.hasItemMeta() && item.getItemMeta().hasLore() && Chat.strip(item.getItemMeta().getDisplayName()).equalsIgnoreCase("Cooldown")) {
                         event.setCancelled(true);
                         player.closeInventory();
                         player.sendMessage(prefix + Chat.colourize("&aHow long should the cool down be (in seconds)."));
-                        chatListener.add(player.getUniqueId(), kit);
+                        chatListener.add(player.getUniqueId(), kit, 0);
+                    } else if(item.getType().equals(XMaterial.IRON_INGOT) && item.hasItemMeta() && item.getItemMeta().hasLore() && Chat.strip(item.getItemMeta().getDisplayName()).equalsIgnoreCase("Cost")) {
+                        event.setCancelled(true);
+                        player.closeInventory();
+                        player.sendMessage("&aWhat would you like the cost of this kit to be? &e" + kit.getName());
+                        chatListener.add(player.getUniqueId(), kit, 1);
                     }
                 }
             }
