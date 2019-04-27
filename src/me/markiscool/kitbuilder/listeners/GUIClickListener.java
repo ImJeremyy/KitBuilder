@@ -33,7 +33,7 @@ public class GUIClickListener implements Listener {
         chatListener = plugin.getChatListener();
         m_kit = plugin.getKitManager();
         prefix = Lang.PREFIX.getMessage();
-        economy = plugin.getEconomy();
+        if(plugin.getEconomy() != null) economy = plugin.getEconomy();
     }
 
     /**
@@ -84,7 +84,49 @@ public class GUIClickListener implements Listener {
                         event.setCancelled(true);
                         if(player.hasPermission(Perm.KIT.getPermission())) {
                             if(kit.canReceiveKit(player.getUniqueId())) {
-                                if(economy.getBalance(player) >= kit.getCost()) {
+                                if(economy != null) {
+                                    if (economy.getBalance(player) >= kit.getCost()) {
+                                        if (!kit.getItems().isEmpty()) {
+                                            Inventory inventory = player.getInventory();
+                                            int emptySlots = getEmptySlots(inventory); //get the empty slots
+                                            //if their is room for them to receive the kit...
+                                            if (emptySlots >= kit.getItems().size()) {
+                                                //give them the kit
+                                                for (Map.Entry<Integer, ItemStack> entry : kit.getItems().entrySet()) {
+                                                    int slot = entry.getKey();
+                                                    ItemStack i = entry.getValue();
+                                                    ItemStack check = inventory.getItem(slot); //checks if the desired place is air/null
+                                                    if (check != null) {
+                                                        if (check.getType().equals(Material.AIR)) {
+                                                            inventory.setItem(slot, i);
+                                                        } else {
+                                                            //that slot is taken..
+                                                            inventory.addItem(i);
+                                                        }
+                                                    } else {
+                                                        inventory.setItem(slot, i);
+                                                    }
+                                                }
+                                                player.closeInventory();
+                                                if (!player.hasPermission(Perm.NO_CHARGE.getPermission())) {
+                                                    economy.withdrawPlayer(player, kit.getCost());
+                                                }
+                                                if (!player.hasPermission(Perm.NO_COOLDOWNS.getPermission())) {
+                                                    kit.addCooldownPlayer(player.getUniqueId(), System.currentTimeMillis());
+                                                }
+                                                player.sendMessage(prefix + Chat.colourize("&aSuccessfully received kit &6" + kit.getName()));
+                                            } else {
+                                                player.sendMessage(prefix + Chat.colourize(Lang.INVENTORY_FULL.getMessage()));
+                                                player.closeInventory();
+                                            }
+                                        } else {
+                                            player.sendMessage(prefix + Lang.KIT_EMPTY.getMessage());
+                                            player.closeInventory();
+                                        }
+                                    } else {
+                                        player.sendMessage(prefix + Lang.NOT_ENOUGH_MONEY.getMessage());
+                                    }
+                                } else {
                                     if (!kit.getItems().isEmpty()) {
                                         Inventory inventory = player.getInventory();
                                         int emptySlots = getEmptySlots(inventory); //get the empty slots
@@ -122,8 +164,6 @@ public class GUIClickListener implements Listener {
                                         player.sendMessage(prefix + Lang.KIT_EMPTY.getMessage());
                                         player.closeInventory();
                                     }
-                                } else {
-                                    player.sendMessage(prefix + Lang.NOT_ENOUGH_MONEY.getMessage());
                                 }
                             } else {
                                 long secondsLeft = kit.getCooldown() - TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - kit.getTimeStamp(player.getUniqueId()));

@@ -30,7 +30,7 @@ public class KitCommand implements CommandExecutor {
     public KitCommand(KitBuilderPlugin plugin) {
         prefix = Lang.PREFIX.getMessage();
         m_kit = plugin.getKitManager();
-        economy = plugin.getEconomy();
+        if(plugin.getEconomy() != null) economy = plugin.getEconomy();
 
     }
 
@@ -44,7 +44,47 @@ public class KitCommand implements CommandExecutor {
                     if(m_kit.containsKitName(kitName)) {
                         Kit kit = m_kit.getKit(kitName);
                         if(kit.canReceiveKit(player.getUniqueId())) {
-                            if(economy.getBalance(player) >= kit.getCost()) {
+                            if(economy != null) {
+                                if (economy.getBalance(player) >= kit.getCost()) {
+                                    if (player.hasPermission(kit.getPermission())) {
+                                        if (!kit.getItems().isEmpty()) {
+                                            Inventory inventory = player.getInventory();
+                                            int emptySlots = getEmptySlots(inventory);
+                                            if (emptySlots >= kit.getItems().size()) {
+                                                for (Map.Entry<Integer, ItemStack> entry : kit.getItems().entrySet()) {
+                                                    int slot = entry.getKey();
+                                                    ItemStack i = entry.getValue();
+                                                    ItemStack check = inventory.getItem(slot);
+                                                    if (check != null) {
+                                                        if (check.getType().equals(Material.AIR)) {
+                                                            inventory.setItem(slot, i);
+                                                        } else {
+                                                            inventory.addItem(i);
+                                                        }
+                                                    } else {
+                                                        inventory.setItem(slot, i);
+                                                    }
+                                                }
+                                                if (!player.hasPermission(Perm.NO_CHARGE.getPermission())) {
+                                                    economy.withdrawPlayer(player, kit.getCost());
+                                                }
+                                                if (!player.hasPermission(Perm.NO_COOLDOWNS.getPermission())) {
+                                                    kit.addCooldownPlayer(player.getUniqueId(), System.currentTimeMillis());
+                                                }
+                                                player.sendMessage(prefix + Chat.colourize("&aSuccessfully received kit &6" + kit.getName()));
+                                            } else {
+                                                player.sendMessage(prefix + Lang.INVENTORY_FULL.getMessage());
+                                            }
+                                        } else {
+                                            player.sendMessage(prefix + Lang.KIT_EMPTY.getMessage());
+                                        }
+                                    } else {
+                                        player.sendMessage(prefix + Lang.NO_PERMISSION.getMessage());
+                                    }
+                                } else {
+                                    player.sendMessage(prefix + Lang.NOT_ENOUGH_MONEY.getMessage());
+                                }
+                            } else {
                                 if (player.hasPermission(kit.getPermission())) {
                                     if (!kit.getItems().isEmpty()) {
                                         Inventory inventory = player.getInventory();
@@ -64,7 +104,7 @@ public class KitCommand implements CommandExecutor {
                                                     inventory.setItem(slot, i);
                                                 }
                                             }
-                                            if(!player.hasPermission(Perm.NO_CHARGE.getPermission())) {
+                                            if (!player.hasPermission(Perm.NO_CHARGE.getPermission())) {
                                                 economy.withdrawPlayer(player, kit.getCost());
                                             }
                                             if (!player.hasPermission(Perm.NO_COOLDOWNS.getPermission())) {
@@ -80,8 +120,6 @@ public class KitCommand implements CommandExecutor {
                                 } else {
                                     player.sendMessage(prefix + Lang.NO_PERMISSION.getMessage());
                                 }
-                            } else {
-                                player.sendMessage(prefix + Lang.NOT_ENOUGH_MONEY.getMessage());
                             }
                         } else {
                             long secondsLeft = kit.getCooldown() - TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - kit.getTimeStamp(player.getUniqueId()));
