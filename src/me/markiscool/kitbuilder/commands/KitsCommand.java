@@ -47,6 +47,8 @@ public class KitsCommand implements CommandExecutor {
             } else {
                 sender.sendMessage(prefix + Chat.colourize("&cNo kits! &7Create one with /createkit <kit_name>"));
             }
+        } else {
+            sender.sendMessage(prefix + Lang.NO_PERMISSION.getMessage());
         }
         return true;
     }
